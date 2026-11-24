@@ -1039,17 +1039,18 @@ input[type="checkbox"] {
   padding: 16px max(24px, calc((100% - 1192px) / 2)) 0;
   background: var(--parchment);
 }
-.main:has(.dash.has-cover) .toast-region {
-  background: var(--canvas);
-}
 .main:has(.dash) .toast-region .toast {
   background: var(--canvas);
 }
 
-/* ---------- Notion-style dashboard cover ---------- */
-.page-cover {
+/* ---------- Notion-style cover: background of the hero tile ---------- */
+.dash-hero {
   position: relative;
-  height: 240px;
+}
+.page-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   background-color: var(--parchment);
   background-size: cover;
   background-repeat: no-repeat;
@@ -1058,23 +1059,59 @@ input[type="checkbox"] {
 .page-cover[hidden] {
   display: none;
 }
-.page-cover.is-repositioning {
+.page-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.dash.cover-dark .page-cover::after {
+  background: rgba(0, 0, 0, 0.38);
+}
+.dash.cover-light .page-cover::after {
+  background: rgba(255, 255, 255, 0.4);
+}
+.dash-hero > .tile-inner {
+  position: relative;
+  z-index: 1;
+}
+.dash-hero.is-repositioning {
   cursor: ns-resize;
   touch-action: none;
+  user-select: none;
 }
 .page-cover-actions {
   position: absolute;
-  right: max(24px, calc((100% - 1192px) / 2));
-  bottom: 14px;
+  right: 24px;
+  top: 16px;
   display: flex;
   gap: 8px;
   opacity: 0;
   transition: opacity 0.15s;
 }
-.page-cover:hover .page-cover-actions,
-.page-cover:focus-within .page-cover-actions,
-.page-cover.is-repositioning .page-cover-actions {
+.page-cover-actions[hidden] {
+  display: none;
+}
+.dash-hero:hover .page-cover-actions,
+.page-cover-actions:focus-within,
+.dash-hero.is-repositioning .page-cover-actions {
   opacity: 1;
+}
+/* Text on a dark cover */
+.dash.cover-dark .dash-hero h1,
+.dash.cover-dark .dash-hero h2,
+.dash.cover-dark .dash-tagline,
+.dash.cover-dark .dash-hero .workspace-eyebrow {
+  color: #fff;
+}
+.dash.cover-dark .dash-hero .dash-section-head .text-link {
+  color: #fff;
+}
+.dash.cover-dark .dash-hero .dash-section-head .text-link .icon {
+  filter: invert(1);
+}
+.dash.cover-dark .dash-hero .secondary-button.pill {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.85);
 }
 .cover-chip {
   min-height: 32px;
@@ -1141,7 +1178,7 @@ input[type="checkbox"] {
   border-radius: var(--radius-lg);
 }
 .dash.has-cover .cover-panel {
-  top: 16px;
+  top: 56px;
   left: auto;
   right: 24px;
 }
@@ -1223,7 +1260,4 @@ input[type="checkbox"] {
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--hairline);
-}
-.dash.has-cover .dash-hero {
-  background: var(--canvas);
 }

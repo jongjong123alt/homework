@@ -8,14 +8,13 @@
 {% set week_days = [] %}{% for offset in range(7) %}{% set day = ui_today.fromordinal(ui_today.toordinal() + offset) %}{% set _ = week_days.append({'date': day, 'iso': day.isoformat(), 'count': ui_due_dates|select('equalto', day.isoformat())|list|length}) %}{% endfor %}
 {% set week_total = week_days|sum(attribute='count') %}
 <div class="dash" data-cover-key="{{ session.get('user_id') or 'local' }}">
-<div class="page-cover" id="page-cover" hidden>
-  <div class="page-cover-actions">
-    <button class="cover-chip" type="button" data-cover-open aria-haspopup="dialog" aria-controls="cover-panel">커버 변경</button>
-    <button class="cover-chip" type="button" data-cover-reposition aria-pressed="false">위치 조정</button>
-  </div>
-</div>
 <section class="tile tile-parchment dash-hero" aria-labelledby="dash-title">
+  <div class="page-cover" id="page-cover" aria-hidden="true" hidden></div>
   <div class="tile-inner">
+    <div class="page-cover-actions" id="cover-actions" hidden>
+      <button class="cover-chip" type="button" data-cover-open aria-haspopup="dialog" aria-controls="cover-panel">커버 변경</button>
+      <button class="cover-chip" type="button" data-cover-reposition aria-pressed="false">위치 조정</button>
+    </div>
     <button class="cover-add" type="button" id="cover-add" data-cover-open aria-haspopup="dialog" aria-controls="cover-panel">{{ icon('plus-lg') }} 커버 추가</button>
     <div class="cover-panel" id="cover-panel" role="dialog" aria-modal="false" aria-labelledby="cover-panel-title" hidden>
       <div class="cover-panel-head"><h2 id="cover-panel-title">대시보드 커버</h2><button class="cover-panel-close" type="button" data-cover-close aria-label="커버 설정 닫기">닫기</button></div>
