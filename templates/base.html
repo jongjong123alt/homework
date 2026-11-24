@@ -5,13 +5,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1d1d1f" media="(prefers-color-scheme: dark)">
   <title>{% block title %}과제 노트{% endblock %}</title>
+  <script>(function(){var p="system";try{p=localStorage.getItem("theme-pref")||"system"}catch(e){}var d=p==="dark"||(p==="system"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=d?"dark":"light";document.documentElement.dataset.themePref=p})();</script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/campus.css') }}">
   {% if not signed_in %}<link rel="stylesheet" href="{{ url_for('static', filename='css/marketing.css') }}">{% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui.css') }}">
   <script src="{{ url_for('static', filename='js/campus.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
 </head>
 <body class="{{ 'workspace' if signed_in else 'public-site' }}">
   <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
@@ -26,6 +30,7 @@
         {% endfor %}
       </nav>
       <div class="sidebar-bottom">
+        <div class="theme-switch" role="radiogroup" aria-label="화면 모드"><button type="button" role="radio" data-theme-choice="system" aria-checked="false">시스템</button><button type="button" role="radio" data-theme-choice="light" aria-checked="false">라이트</button><button type="button" role="radio" data-theme-choice="dark" aria-checked="false">다크</button></div>
         {% if session.get('user_id') %}
         <div class="account-label">{{ icon('person-circle') }}<span>내 워크스페이스</span></div>
         <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit" class="logout-button">{{ icon('box-arrow-right') }} 로그아웃</button></form>
@@ -47,7 +52,7 @@
       </header>{% endif %}
       {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="toast-region">{% for category, message in messages %}<div class="toast {{ category }}" role="status">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
       {% block content %}{% endblock %}
-      <footer class="site-footer">과제 노트 <span>공지부터 마감까지, 나의 속도로.</span>{% if not signed_in %}<a href="{{ url_for('dashboard') }}#faq">이용 안내</a><a href="{{ url_for('login') }}">로그인</a>{% endif %}</footer>
+      <footer class="site-footer">과제 노트 <span>공지부터 마감까지, 나의 속도로.</span>{% if not signed_in %}<a href="{{ url_for('dashboard') }}#faq">이용 안내</a><a href="{{ url_for('login') }}">로그인</a><div class="theme-switch" role="radiogroup" aria-label="화면 모드"><button type="button" role="radio" data-theme-choice="system" aria-checked="false">시스템</button><button type="button" role="radio" data-theme-choice="light" aria-checked="false">라이트</button><button type="button" role="radio" data-theme-choice="dark" aria-checked="false">다크</button></div>{% endif %}</footer>
     </main>
   </div>
 </body>

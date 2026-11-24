@@ -10,7 +10,7 @@
   gap: 26px;
   padding: 17px max(28px, calc((100vw - 1280px) / 2));
   border-bottom: 1px solid var(--line);
-  background: #fff;
+  background:var(--lc-fff);
   min-height: 84px;
   position: relative;
   z-index: 10;
@@ -37,7 +37,7 @@
 }
 .marketing-nav a,
 .marketing-login {
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
@@ -85,16 +85,16 @@
   line-height: 1.32;
   letter-spacing: -2.5px;
   margin: 23px 0 27px;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
 }
 .marketing-hero h1 em {
   font-style: normal;
-  color: #0066cc;
+  color:var(--lc-0066cc);
 }
 .hero-description {
   font-size: 16px;
   line-height: 1.9;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   word-break: keep-all;
   margin: 0 0 30px;
 }
@@ -116,11 +116,11 @@
 }
 .hero-product {
   margin: 0;
-  background: #ededf0;
-  border: 1px solid #d2d2d7;
+  background:var(--lc-ededf0);
+  border:1px solid var(--lc-d2d2d7);
   border-radius: 18px;
   padding: 23px 23px 0;
-  box-shadow: 0 20px 50px #24472e0c;
+  box-shadow:0 20px 50px #24472e0c;
   min-width: 0;
 }
 .product-caption {
@@ -139,7 +139,7 @@
   font-weight: 700;
 }
 .product-caption > span:last-child {
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   font-size: 10px;
 }
 .hero-product > img {
@@ -149,11 +149,11 @@
   border: 1px solid var(--line);
   border-radius: 9px;
   background: white;
-  box-shadow: 0 6px 20px #24472e0d;
+  box-shadow:0 6px 20px #24472e0d;
 }
 .hero-product figcaption {
   font-size: 12px;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   text-align: center;
   padding: 21px 0;
 }
@@ -167,7 +167,7 @@
   gap: 65px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   font-size: 13px;
 }
 .marketing-benefits span {
@@ -205,7 +205,7 @@
 }
 .marketing-feature {
   position: relative;
-  border-top: 1px solid #86868b;
+  border-top:1px solid var(--lc-86868b);
   padding: 27px 0 12px;
 }
 .marketing-feature .feature-icon {
@@ -216,7 +216,7 @@
 .feature-number {
   float: right;
   font-size: 12px;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   margin-top: 3px;
 }
 .marketing-feature h3 {
@@ -279,7 +279,7 @@
   align-items: flex-start;
   gap: 10px;
   font-size: 13px;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   padding: 9px 0;
 }
 .story-points .icon {
@@ -300,7 +300,7 @@
   max-width: 1220px;
 }
 .how-steps li {
-  border-top: 1px solid #86868b;
+  border-top:1px solid var(--lc-86868b);
   padding-top: 25px;
 }
 .how-steps li > span {
@@ -328,10 +328,10 @@
   margin-top: 18px;
 }
 .ai-example {
-  border: 1px solid #86868b;
+  border:1px solid var(--lc-86868b);
   border-radius: 15px;
   padding: 27px;
-  background: #f5f5f7;
+  background:var(--lc-f5f5f7);
 }
 .example-label {
   display: flex;
@@ -357,14 +357,14 @@
 .example-input > span,
 .example-result > span {
   font-size: 11px;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   font-weight: 600;
 }
 .example-input p {
   font-size: 14px;
   line-height: 1.9;
   margin: 9px 0;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
 }
 .example-result {
   padding-top: 22px;
@@ -432,7 +432,7 @@
 .marketing-cta {
   text-align: center;
   padding: 62px 24px 75px;
-  background: #ededf0;
+  background:var(--lc-ededf0);
 }
 .marketing-cta > img {
   display: block;
@@ -537,7 +537,7 @@
     width: 100%;
     justify-content: center;
     gap: 35px;
-    border-top: 1px solid #ededf0;
+    border-top:1px solid var(--lc-ededf0);
     margin-top: 6px;
     padding-top: 5px;
   }
@@ -840,7 +840,7 @@
 }
 .tour-intro h1 em {
   font-style: normal;
-  color: #0066cc;
+  color:var(--lc-0066cc);
 }
 .tour-intro > p:not(.marketing-eyebrow) {
   font-size: 16px;
@@ -866,7 +866,7 @@
   white-space: nowrap;
 }
 .tour-chapters span {
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   font-size: 11px;
 }
 .tour-chapters a:hover {
@@ -911,13 +911,13 @@
   word-break: keep-all;
 }
 .scene-example {
-  border-left: 2px solid #86868b;
+  border-left:2px solid var(--lc-86868b);
   padding-left: 18px;
   margin: 25px 0;
 }
 .scene-example strong {
   display: block;
-  color: #0066cc;
+  color:var(--lc-0066cc);
   font-size: 13px;
   margin-bottom: 5px;
 }
@@ -960,9 +960,9 @@
 }
 .tour-ai-flow {
   padding: 35px;
-  background: #ededf0;
+  background:var(--lc-ededf0);
   border-radius: 14px;
-  border: 1px solid #d2d2d7;
+  border:1px solid var(--lc-d2d2d7);
 }
 .flow-label {
   display: flex;
@@ -983,7 +983,7 @@
   align-items: flex-start;
   gap: 20px;
   padding: 22px 0;
-  border-top: 1px solid #d2d2d7;
+  border-top:1px solid var(--lc-d2d2d7);
 }
 .tour-ai-flow li > span {
   font-size: 20px;
@@ -996,13 +996,13 @@
 }
 .tour-ai-flow li p {
   font-size: 12px;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   margin: 0;
 }
 .flow-footnote {
   font-size: 11px;
   line-height: 1.8;
-  color: #6e6e73;
+  color:var(--lc-6e6e73);
   margin: 25px 0 0;
 }
 .tour-finish {
