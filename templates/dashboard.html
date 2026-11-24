@@ -7,9 +7,27 @@
 {% set today_count = planning.today_plans|length + planning.today_tasks|length %}
 {% set week_days = [] %}{% for offset in range(7) %}{% set day = ui_today.fromordinal(ui_today.toordinal() + offset) %}{% set _ = week_days.append({'date': day, 'iso': day.isoformat(), 'count': ui_due_dates|select('equalto', day.isoformat())|list|length}) %}{% endfor %}
 {% set week_total = week_days|sum(attribute='count') %}
-<div class="dash">
+<div class="dash" data-cover-key="{{ session.get('user_id') or 'local' }}">
+<div class="page-cover" id="page-cover" hidden>
+  <div class="page-cover-actions">
+    <button class="cover-chip" type="button" data-cover-open aria-haspopup="dialog" aria-controls="cover-panel">커버 변경</button>
+    <button class="cover-chip" type="button" data-cover-reposition aria-pressed="false">위치 조정</button>
+  </div>
+</div>
 <section class="tile tile-parchment dash-hero" aria-labelledby="dash-title">
   <div class="tile-inner">
+    <button class="cover-add" type="button" id="cover-add" data-cover-open aria-haspopup="dialog" aria-controls="cover-panel">{{ icon('plus-lg') }} 커버 추가</button>
+    <div class="cover-panel" id="cover-panel" role="dialog" aria-modal="false" aria-labelledby="cover-panel-title" hidden>
+      <div class="cover-panel-head"><h2 id="cover-panel-title">대시보드 커버</h2><button class="cover-panel-close" type="button" data-cover-close aria-label="커버 설정 닫기">닫기</button></div>
+      <p class="cover-panel-note">이 브라우저에만 저장돼요. 다른 기기나 브라우저에는 표시되지 않아요.</p>
+      <h3>기본 커버</h3>
+      <div class="cover-presets" role="list"></div>
+      <h3>내 이미지</h3>
+      <label class="cover-upload"><span>이미지 업로드</span><input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+      <p class="cover-panel-note">JPG·PNG·WEBP·GIF, 10MB 이하. 저장할 때 가로 1920px 이하로 줄여요.</p>
+      <p class="cover-status" id="cover-status" role="status" aria-live="polite"></p>
+      <div class="cover-panel-foot"><button class="secondary-button" type="button" data-cover-remove>커버 제거</button></div>
+    </div>
     <p class="workspace-eyebrow">내 과제 대시보드 · {{ ui_today.month }}월 {{ ui_today.day }}일 {{ '월화수목금토일'[ui_today.weekday()] }}요일</p>
     <h1 id="dash-title">오늘 할 일 {{ today_count }}개</h1>
     <p class="dash-tagline">앞으로 7일 안에 마감 {{ week_total }}개{% if insights.overdue %} · 기한 지난 과제 {{ insights.overdue }}개{% endif %}</p>
@@ -71,6 +89,6 @@
     </aside>
   </div>
 </section>
-  <script id="notification-data" type="application/json">{{ notification_payload|tojson }}</script><script src="{{ url_for('static', filename='js/deadline_notifications.js') }}" defer></script>
+  <script id="notification-data" type="application/json">{{ notification_payload|tojson }}</script><script src="{{ url_for('static', filename='js/deadline_notifications.js') }}" defer></script><script src="{{ url_for('static', filename='js/cover.js') }}" defer></script>
 </div>
 {% endblock %}

@@ -45,7 +45,7 @@
         <nav class="marketing-nav" aria-label="서비스 소개 메뉴"><a href="{{ url_for('dashboard') }}#features">주요 기능</a><a href="{{ url_for('dashboard') }}#how-it-works">사용 방법</a><a href="{{ url_for('dashboard') }}#ai">AI 분석</a></nav>
         <div class="marketing-account"><a class="marketing-login" href="{{ url_for('login') }}">로그인</a><a class="primary-button" href="{{ url_for('login') }}">과제 관리 시작 {{ icon('arrow-right') }}</a></div>
       </header>{% endif %}
-      {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="toast {{ category }}" role="status">{{ message }}</div>{% endfor %}{% endwith %}
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="toast-region">{% for category, message in messages %}<div class="toast {{ category }}" role="status">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
       {% block content %}{% endblock %}
       <footer class="site-footer">과제 노트 <span>공지부터 마감까지, 나의 속도로.</span>{% if not signed_in %}<a href="{{ url_for('dashboard') }}#faq">이용 안내</a><a href="{{ url_for('login') }}">로그인</a>{% endif %}</footer>
     </main>

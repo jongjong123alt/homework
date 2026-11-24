@@ -1020,3 +1020,210 @@ input[type="checkbox"] {
 .public-site .hero-copy h1 em {
   color: var(--primary);
 }
+
+/* ---------- Flash messages aligned with the content column ---------- */
+.toast-region {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 16px 24px 0;
+}
+.toast-region .toast {
+  width: 100%;
+  max-width: none;
+  margin: 0 0 8px;
+}
+.main:has(.dash) .toast-region {
+  max-width: none;
+  padding: 16px max(24px, calc((100% - 1192px) / 2)) 0;
+  background: var(--parchment);
+}
+.main:has(.dash.has-cover) .toast-region {
+  background: var(--canvas);
+}
+.main:has(.dash) .toast-region .toast {
+  background: var(--canvas);
+}
+
+/* ---------- Notion-style dashboard cover ---------- */
+.page-cover {
+  position: relative;
+  height: 240px;
+  background-color: var(--parchment);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 50%;
+}
+.page-cover[hidden] {
+  display: none;
+}
+.page-cover.is-repositioning {
+  cursor: ns-resize;
+  touch-action: none;
+}
+.page-cover-actions {
+  position: absolute;
+  right: max(24px, calc((100% - 1192px) / 2));
+  bottom: 14px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.page-cover:hover .page-cover-actions,
+.page-cover:focus-within .page-cover-actions,
+.page-cover.is-repositioning .page-cover-actions {
+  opacity: 1;
+}
+.cover-chip {
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 9999px;
+  background: rgba(210, 210, 215, 0.64);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: -0.12px;
+  cursor: pointer;
+}
+.cover-chip:active {
+  transform: scale(0.95);
+}
+.cover-chip[hidden] {
+  display: none;
+}
+.dash-hero .tile-inner {
+  position: relative;
+}
+.cover-add {
+  position: absolute;
+  left: 24px;
+  top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: -0.224px;
+  cursor: pointer;
+}
+.cover-add .icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+.cover-add:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ink);
+}
+.dash.has-cover .cover-add {
+  display: none;
+}
+.cover-panel {
+  position: absolute;
+  left: 24px;
+  top: 56px;
+  z-index: 25;
+  width: 380px;
+  max-width: calc(100% - 48px);
+  padding: 20px;
+  text-align: left;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+}
+.dash.has-cover .cover-panel {
+  top: 16px;
+  left: auto;
+  right: 24px;
+}
+.cover-panel[hidden] {
+  display: none;
+}
+.cover-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cover-panel h2 {
+  margin: 0;
+  font-size: 17px;
+}
+.cover-panel h3 {
+  margin: 18px 0 8px;
+  font-size: 14px;
+  letter-spacing: -0.224px;
+}
+.cover-panel-close {
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: 14px;
+  cursor: pointer;
+  min-height: 32px;
+}
+.cover-panel-note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  letter-spacing: -0.12px;
+  color: var(--muted);
+}
+.cover-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.cover-preset {
+  height: 56px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-sm);
+  background-size: cover;
+  cursor: pointer;
+}
+.cover-preset:active {
+  transform: scale(0.95);
+}
+.cover-upload {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+.cover-upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.cover-upload:focus-within {
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+.cover-status {
+  min-height: 1.4em;
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.cover-panel-foot {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hairline);
+}
+.dash.has-cover .dash-hero {
+  background: var(--canvas);
+}
