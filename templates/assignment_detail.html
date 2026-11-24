@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block title %}{{ assignment.title }} · 과제 노트{% endblock %}
+{% block breadcrumb %}과제 상세{% endblock %}
+{% block content %}
+<section class="content">
+  <a class="back-link" href="{{ url_for('assignment_list') }}">← 과제 관리</a>
+  <div class="detail-heading"><h1>{{ assignment.title }}</h1><span class="status status-{{ assignment.status }}">{{ statuses[assignment.status] }}</span></div>
+  <dl class="details">
+    <div><dt>과목</dt><dd>{{ assignment.course or '미지정' }}</dd></div>
+    <div><dt>제출기한</dt><dd>{{ assignment.due_date or '미지정' }}</dd></div>
+    <div><dt>진행 상태</dt><dd>{{ statuses[assignment.status] }}</dd></div>
+    <div><dt>우선순위</dt><dd><span class="priority-tag priority-{{ assignment.priority }}">{{ priorities[assignment.priority] }}</span></dd></div>
+    {% set badge = deadline_badge(assignment.due_date, assignment.status) %}
+    {% if badge %}<div><dt>남은 기한</dt><dd><span class="deadline-badge deadline-{{ badge.kind }}">{{ badge.label }}</span></dd></div>{% endif %}
+  </dl>
+  <h2 class="description-title">과제 설명</h2>
+  <p class="description-body">{{ assignment.description or '등록된 설명이 없습니다.' }}</p>
+  <section class="checklist-section" aria-labelledby="checklist-title">
+    <div class="section-head">
+      <h2 id="checklist-title">할 일 체크리스트</h2>
+      <span class="muted">{{ done_count }} / {{ checklist_items|length }} 완료</span>
+    </div>
+    <p class="muted">오늘 할 일로 직접 지정할 수 있습니다. 직접 지정을 해제해도 오늘 마감인 작업은 대시보드에 자동 표시됩니다.</p>
+    {% if checklist_items %}
+      <div class="checklist-progress" aria-label="과제 체크리스트 완료율" role="progressbar" aria-valuenow="{{ done_count }}" aria-valuemin="0" aria-valuemax="{{ checklist_items|length }}">
+        <div style="width: {{ (done_count / checklist_items|length * 100)|round|int }}%"></div>
+      </div>
+      <ul class="checklist-list">
+        {% for item in checklist_items %}
+          <li class="checklist-row">
+            <form method="post" action="{{ url_for('toggle_checklist_item', assignment_id=assignment.id, item_id=item.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="check-toggle" type="submit" aria-label="{{ '완료 취소' if item.is_done else '완료 표시' }}: {{ item.content }}">{{ icon('check-square' if item.is_done else 'square') }}</button>
+            </form>
+            <span class="check-text {% if item.is_done %}checked{% endif %}">{{ item.content }}</span>
+            {% if not item.is_done and assignment.status != 'done' %}<form method="post" action="{{ url_for('focus_task', assignment_id=assignment.id, item_id=item.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="secondary-button focus-task-button" type="submit" aria-pressed="{{ 'true' if item.focus_date == ui_today.isoformat() else 'false' }}">{{ '직접 지정 해제' if item.focus_date == ui_today.isoformat() else '오늘 할 일에 추가' }}</button></form>{% endif %}
+            <details class="check-edit">
+              <summary>수정</summary>
+              <form method="post" action="{{ url_for('edit_checklist_item', assignment_id=assignment.id, item_id=item.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input name="content" aria-label="할 일 수정" maxlength="300" required value="{{ item.content }}">
+                <button type="submit" class="secondary-button">저장</button>
+              </form>
+            </details>
+            <form method="post" action="{{ url_for('delete_checklist_item', assignment_id=assignment.id, item_id=item.id) }}" onsubmit="return confirm('이 할 일을 삭제할까요?')">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button type="submit" class="check-delete">삭제</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">아직 등록된 할 일이 없습니다.</p>
+    {% endif %}
+    <form class="check-add-form" method="post" action="{{ url_for('add_checklist_item', assignment_id=assignment.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input name="content" maxlength="300" required placeholder="새 할 일 입력" aria-label="새 할 일">
+      <button type="submit" class="secondary-button">+ 추가</button>
+    </form>
+  </section>
+  <section class="feature-panel" id="study-plan">
+    <div class="section-head"><h2>AI 일정 자동 분배</h2></div>
+    <p class="muted">Gemini가 제안한 일정입니다. 아래 수동 생성 버튼은 기존 일정을 모두 교체합니다.</p>
+    <div class="auto-replan-controls">
+      <form method="post" action="{{ url_for('toggle_auto_replan', assignment_id=assignment.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="enabled" value="{{ 'no' if assignment.auto_replan_enabled else 'yes' }}">
+        <button type="submit" class="secondary-button">{{ '자동 재계획 끄기' if assignment.auto_replan_enabled else 'AI 자동 재계획 켜기' }}</button>
+      </form>
+      <span class="muted">상태: {{ '켜짐' if assignment.auto_replan_enabled else '꺼짐' }}</span>
+    </div>
+    <p class="muted">켜면 과제 내용·제출기한·우선순위 또는 체크리스트 변경 후 Gemini가 자동으로 새 계획을 생성합니다. 요청 중 최대 약 30초 기다릴 수 있으며, 실패 시 기존 계획은 유지됩니다. 직접 수정한 일정은 보존합니다.</p>
+    {% if assignment.replan_pending and assignment.auto_replan_enabled %}
+      <div class="form-errors" role="status"><p>자동 재계획이 완료되지 않았습니다. 현재 계획을 유지하고 있습니다.</p></div>
+      <form method="post" action="{{ url_for('retry_auto_replan', assignment_id=assignment.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="secondary-button" type="submit">AI 재계획 다시 시도</button>
+      </form>
+    {% endif %}
+    <form method="post" action="{{ url_for('make_study_plan', assignment_id=assignment.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="secondary-button" type="submit">Gemini 일정 생성 / 다시 생성</button>
+    </form>
+    {% if study_plan %}
+      <ul class="feature-list">{% for entry in study_plan %}
+        <li><strong>{{ entry.plan_date }}</strong> · {{ entry.content }}{% if entry.is_manual %} <span class="muted">(직접 수정)</span>{% endif %}
+          <details><summary>일정 수정</summary>
+            <form class="inline-edit" method="post" action="{{ url_for('edit_study_plan', assignment_id=assignment.id, entry_id=entry.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="date" aria-label="학습 계획 날짜" name="date" required value="{{ entry.plan_date }}">
+              <input name="content" aria-label="학습 계획 내용" maxlength="300" required value="{{ entry.content }}">
+              <button class="secondary-button" type="submit">저장</button>
+            </form>
+          </details>
+          <form method="post" action="{{ url_for('delete_study_plan', assignment_id=assignment.id, entry_id=entry.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="check-delete" type="submit">삭제</button>
+          </form>
+        </li>
+      {% endfor %}</ul>
+    {% else %}<p class="muted">생성된 일정이 없습니다.</p>{% endif %}
+  </section>
+  <section class="feature-panel" id="attachments">
+    <div class="section-head"><h2>첨부파일</h2><span class="muted">{{ attachments|length }}개</span></div>
+    <p class="muted">PDF, PNG, JPG, UTF-8 TXT, DOCX · 파일당 최대 5MB</p>
+    <form class="inline-edit" method="post" enctype="multipart/form-data" action="{{ url_for('add_attachment', assignment_id=assignment.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="file" aria-label="과제 첨부파일 선택" name="attachment" accept=".pdf,.png,.jpg,.jpeg,.txt,.docx" required>
+      <button type="submit" class="secondary-button">파일 첨부</button>
+    </form>
+    {% if attachments %}<ul class="feature-list">
+      {% for file in attachments %}
+      <li><a href="{{ url_for('download_attachment', assignment_id=assignment.id, attachment_id=file.id) }}">{{ file.original_name }}</a>
+        <span class="muted">({{ (file.byte_size / 1024)|round(1) }} KB)</span>
+        <form method="post" action="{{ url_for('delete_attachment', assignment_id=assignment.id, attachment_id=file.id) }}" onsubmit="return confirm('파일을 삭제할까요?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="check-delete" type="submit">삭제</button>
+        </form>
+      </li>{% endfor %}
+    </ul>{% endif %}
+  </section>
+  <section class="assignment-notes" id="assignment-notes" aria-labelledby="notes-heading">
+    <div class="section-head"><h2 id="notes-heading">메모 및 진행 기록</h2><span class="muted">{{ notes|length }}개 기록</span></div>
+    <form class="assignment-form" method="post" action="{{ url_for('add_assignment_note', assignment_id=assignment.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="note-kind">기록 종류</label>
+      <select id="note-kind" name="kind"><option value="note">메모</option><option value="progress">진행 기록</option></select>
+      <label for="note-content">내용</label>
+      <textarea id="note-content" name="content" maxlength="2000" rows="3" required placeholder="작업 내용, 진행 상황 등을 기록해 주세요."></textarea>
+      <button class="secondary-button" type="submit">+ 기록 추가</button>
+    </form>
+    {% if notes %}
+      <ul class="note-history">
+        {% for note in notes %}
+          <li class="note-entry">
+            <div class="note-entry-top">
+              <span class="status {{ 'status-doing' if note.kind == 'progress' else 'status-todo' }}">{{ '진행 기록' if note.kind == 'progress' else '메모' }}</span>
+              <time class="muted">{{ note.created_at }}</time>
+            </div>
+            <p class="note-entry-content">{{ note.content }}</p>
+            <div class="note-entry-actions">
+              <details><summary>수정</summary>
+                <form method="post" class="note-edit-form" action="{{ url_for('edit_assignment_note', assignment_id=assignment.id, note_id=note.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                  <select name="kind" aria-label="기록 종류"><option value="note" {{ 'selected' if note.kind == 'note' else '' }}>메모</option><option value="progress" {{ 'selected' if note.kind == 'progress' else '' }}>진행 기록</option></select>
+                  <textarea name="content" maxlength="2000" rows="3" required aria-label="기록 수정">{{ note.content }}</textarea>
+                  <button class="secondary-button" type="submit">수정 저장</button>
+                </form>
+              </details>
+              <form method="post" action="{{ url_for('delete_assignment_note', assignment_id=assignment.id, note_id=note.id) }}" onsubmit="return confirm('이 기록을 삭제할까요?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <button type="submit" class="check-delete">삭제</button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">아직 작성한 메모나 진행 기록이 없습니다.</p>
+    {% endif %}
+  </section>
+  <div class="form-actions"><a class="primary-button" href="{{ url_for('edit_assignment', assignment_id=assignment.id) }}">과제 수정</a>
+    <form method="post" action="{{ url_for('delete_assignment', assignment_id=assignment.id) }}" onsubmit="return confirm('이 과제를 삭제할까요? 삭제 후 복구할 수 없습니다.')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="danger-button">과제 삭제</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

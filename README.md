@@ -1,2 +1,92 @@
-# homework
-homework
+# AI 기반 과제 분석 및 일정 관리 웹서비스
+
+Python Flask + SQLite + Google Gemini 기반 대학 과제 관리 프로토타입. 기존 노션 스타일 UI와 과제·체크리스트·달력 기능을 유지하며 F-01~F-21 기능을 단계적으로 구현했습니다.
+
+## 설치와 실행 (Windows PowerShell)
+
+```powershell
+git pull origin main
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python app.py
+```
+
+브라우저에서 `http://127.0.0.1:5000` 접속. 로그인 전에는 공개 서비스 소개와 주요 기능의 사용 장면을 볼 수 있습니다. 실제 과제 등록·조회 및 Gemini AI 사용은 로그인 후에만 가능합니다. 배포 사이트에서도 로그인 화면의 새 계정 만들기로 가입할 수 있습니다. 운영 환경의 공개 가입은 소유자 없는 기존 과제를 자동으로 가져오지 않습니다. 로컬 개발의 첫 로컬 가입은 기존 데이터 이전 동작을 유지하므로 기존 DB의 실제 소유자가 진행하세요.
+
+### .env 설정
+
+프로젝트 루트에 `.env.example`을 참고하여 `.env` 파일을 만드세요. `.env`는 Git에서 제외됩니다.
+
+```ini
+GEMINI_API_KEY=본인_Gemini_API_키
+GEMINI_MODEL=gemini-2.5-flash
+FLASK_SECRET_KEY=본인이_생성한_랜덤_시크릿
+```
+
+시크릿 생성 예시: `python -c "import secrets; print(secrets.token_hex(32))"`
+
+API 키가 없어도 일반 과제 관리 기능은 사용할 수 있으나 Gemini 공지 분석(F-04)과 AI 일정 분배(F-14)는 사용할 수 없습니다.
+
+## 로그인 전 기능 미리보기
+
+- `/` 서비스 소개: 과제 정리의 장점과 주요 사용 흐름 안내
+- `/features`: 주요 기능을 사용 장면 중심으로 소개
+- `/preview/<기능>`: 기존 정적 예시 경로로 주요 메뉴에서는 미노출. **실제 과제 DB에 접근하지 않음**
+- `/assignments/new`, `/ai/analyze`, `/ai/analyze-file` 및 모든 개인 데이터 경로는 로그인 필수. 로그인 전 GET은 로그인 페이지로 이동하며 POST는 401 응답
+- 기존 계정의 과제와 데이터는 로그인하지 않은 방문자에게 표시하지 않음
+
+## 공지문과 PDF·이미지 통합 분석
+
+로그인 후 **AI 공지 분석**에서 텍스트(과제 요구사항)와 PDF/PNG/JPG(5MB 이하)를 동시에 입력하고 한 번에 분석할 수 있습니다. 둘 중 하나만 입력해도 됩니다. 파일·텍스트가 서로 다르면 결과를 검토하고 수정한 후 저장하세요. 기존 JSON·CSV 내보내기 경로는 제거 상태이며, 데이터 백업 메뉴에서 계정별 ZIP 백업·추가 복원을 사용할 수 있습니다.
+
+## 주요 기능
+
+- F-01~F-07: 과제 CRUD, 체크리스트, Gemini 공지 분석·저장, 달력, 검색/필터
+- F-08~F-12: D-day, 우선순위, 공지 요구사항 분석, 메모, 통계
+- **F-13:** 앱 내부 마감 알림 및 오늘 할 일
+- **F-14:** Gemini 기반 날짜별 학습 계획 생성 및 일정 편집
+- **F-15:** 동일 날짜 마감 충돌 감지 및 규칙 기반 시작일 추천
+- **F-16:** PDF·이미지와 공지 텍스트를 한 번에 분석하는 통합 입력
+- **F-17:** PDF·PNG·JPG·UTF-8 TXT·DOCX 첨부파일 관리 (파일당 5MB)
+- **F-18:** 비밀번호 해시, 로그인·로그아웃, 사용자별 데이터 접근 제한
+- **F-19:** PDF·PNG·JPG 공지문과 텍스트 요구사항을 한 번의 Gemini 요청으로 분석하여 수정 가능한 미리보기 제공
+- **F-20:** 브라우저 알림 권한 동의 후 대시보드 접속 시 마감 알림 (하루 중복 방지, 페이지 닫힌 상태의 푸시 아님)
+- **F-21:** 과제·체크리스트 변경 시 선택형 Gemini 자동 재계획 (실패 시 기존 일정 유지, 직접 수정한 일정 보존)
+
+## 기존 사용자 주의사항
+
+1. **업데이트 전에** `instance/assignments.db`와 `instance/uploads` 폴더를 별도로 백업합니다.
+2. DB 스키마는 앱 시작 시 기존 데이터를 유지하면서 필요한 컬럼/테이블을 추가합니다.
+3. 첫 계정 생성 시 기존 소유자 미지정 과제는 그 계정으로 이전됩니다.
+4. 기존 JSON·CSV 경로는 제거 상태입니다. 새 데이터 백업 메뉴의 ZIP은 현재 계정 기록과 첨부파일만 담으며, 복원 시 기존 기록을 덮어쓰지 않고 추가합니다.
+5. 로그인/데이터 분리를 구현했지만 **공개 인터넷 서비스로 배포하기 위한 보안 검증은 아직 완료되지 않았습니다.**
+
+## 테스트
+
+GitHub Actions가 push 시 Python 문법 검사 및 `python -m unittest discover -s tests -v`를 실행합니다. 실제 Gemini API 응답, Windows 환경, 브라우저에서의 파일 업로드·다운로드는 사용자가 별도 확인해야 합니다.
+
+자세한 검증 절차: [F-13~F-18 검증 문서](docs/F13_F18_VALIDATION.md) · [F-19~F-21 검증 문서](docs/F19_F21_VALIDATION.md)
+
+## 일상 관리 기능
+
+오늘 할 일 직접 지정, 목록의 빠른 상태 변경, 완료 보관함, 과목별 모아보기, AI 요청 수량 점검과 수정 후 재점검, 계정별 ZIP 백업·복원을 지원합니다. [사용법·제한·검증](docs/PRODUCTIVITY_FEATURES.md)을 참고하세요. 기존 DB는 시작할 때 필요한 열을 자동 추가합니다.
+
+## 시스템 설계 문서
+
+[전체 설계 안내](docs/DESIGN_OVERVIEW.md)에서 아키텍처 → 화면 구성 → 데이터 모델 → 플로우차트를 확인할 수 있습니다.
+
+- [편집 가능한 draw.io 원본](docs/diagrams/assignment-system.drawio) · [7페이지 PDF](docs/diagrams/assignment-system.pdf)
+- [아키텍처](docs/ARCHITECTURE.md) · [화면 구성](docs/SCREEN_DESIGN.md) · [데이터 모델](docs/DATA_MODEL.md)
+- [실제 라우트 목록](docs/ROUTE_CATALOG.md) · [플로우차트 안내](docs/FLOWCHART.md)
+
+## 데모데이·최종 제출 준비
+
+[최종 제출 체크리스트](docs/DEMO_DAY_CHECKLIST.md) · [AI 기능 설명](docs/AI_FUNCTION.md) · [최신 검증 기록](docs/DEMO_DAY_VERIFICATION.md)
+
+제출 기한: 2026-11-30(월) 22:00(한국 시간), 카카오워크 수업 1:1 대화방. 2026-11-24 확인 기준 서비스는 미배포 상태입니다.
+
+## 운영 배포
+
+Render 연결용 `render.yaml`, Gunicorn 실행 설정과 영구 데이터 경로를 제공합니다. [배포 안내](docs/DEPLOYMENT.md)를 따라 환경변수·영구 디스크·발표 계정을 준비하세요. 제공된 Render Blueprint는 유료 서비스와 디스크를 사용하며, 실제 서비스 생성은 별도입니다.
+
+배포 환경 공개 회원가입 지원: 로그인 화면의 **새 계정 만들기**에서 가입할 수 있습니다. [변경·검증 기록](docs/PUBLIC_SIGNUP_VALIDATION.md). 무료 임시 저장소의 데이터 유실 가능성은 남아 있습니다.
